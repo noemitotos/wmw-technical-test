@@ -1,0 +1,103 @@
+{% comment %}
+------------------------------------------------------------------------------
+  Section: Featured collection
+  - This the main section that you should be working on
+  - Main styling is done in /styles/sections/featured-collection.scss
+------------------------------------------------------------------------------
+{% endcomment %}
+
+<section
+  class="featured-collection"
+  data-section-id="{{ section.id }}"
+  data-section-type="featured-collection"
+>
+  {%- assign collection = collections[section.settings.collection] -%}
+
+  <div class="container">
+    <div class="row">
+      <div class="col xs12">
+        <h2>
+          {{ collection.title | escape }}
+        </h2>
+
+        <p class="description">
+          {{ collection.description }}
+        </p>
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            {% for product in collection.products limit: 8 %}
+              {% assign current_variant = product.selected_or_first_available_variant %}
+              <div class="swiper-slide">
+                <a class="product-card" href="{{ product.url | within: collection }}">
+                  <div class="image-wrapper">
+                    {% if product.featured_image != blank %}
+                    {{ product.featured_image | img_url: 'large' | img_tag }}
+                    {% endif %}
+
+                    {% for tag in product.tags %}
+                      {% if tag contains 'badge: sale' %}
+                        {%- assign sale = tag | replace: 'badge: ','' -%}
+                          <span class="sale-badge">{{ sale | capitalize }}</span>
+                      {% endif %}
+                    {% endfor %}
+
+                    <span
+                    class="product-card__add-to-cart"
+                    data-quantity="1"
+                    data-variant-id="{{ current_variant.id }}"
+                    js-ajax-cart="addToCart"
+                    >
+                    Add to cart
+                  </span>
+
+                </div>
+
+                <div class="text-wrapper">
+                  <p>{{ product.title | escape }}</p>
+
+                  <span class="price">
+                    {% include 'product-price' %}
+                  </span>
+
+                </div>
+              </a>
+            </div>
+            {% endfor %}
+          </div>
+          <!-- If we need pagination -->
+          <div class="swiper-pagination"></div>
+        </div>
+        <a href="/collections" class="btn btn-primary">View collection</a>
+
+        <!-- navigation buttons -->
+        <div class="swiper-button-prev"></div>
+        <div class="swiper-button-next"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+  {
+    "name": "Featured collection",
+    "settings": [
+      {
+        "type": "text",
+        "id": "title",
+        "label": "Heading",
+        "default": "Featured collection"
+      },
+      {
+        "id": "collection",
+        "type": "collection",
+        "label": "Collection"
+      }
+    ],
+    "presets": [
+      {
+        "name": "Featured collection",
+        "category": "Collection"
+      }
+    ]
+  }
+{% endschema %}
